@@ -1,9 +1,9 @@
 import type { OAuthConfig, OAuthUserConfig } from 'next-auth/providers'
 import { decodeJwt } from 'jose'
 
-export default function Strike<
-  P extends Record<string, any>
->(options: OAuthUserConfig<P>): OAuthConfig<P> {
+export default function Strike<P extends Record<string, any>>(
+  options: OAuthUserConfig<P>
+): OAuthConfig<P> {
   return {
     id: 'strike',
     name: 'Strike',
@@ -13,7 +13,7 @@ export default function Strike<
       params: {
         scope: process.env.STRIKE_API_SCOPE,
         response_type: 'code',
-      }
+      },
     },
     idToken: false,
     checks: ['pkce', 'state'],
@@ -21,7 +21,7 @@ export default function Strike<
       url: `${process.env.STRIKE_IDENTITY_SERVER_URL}/connect/userinfo`,
       async request({ tokens }) {
         return decodeJwt(tokens.access_token ?? '')
-      }
+      },
     },
     profile(profile) {
       return {
@@ -31,6 +31,6 @@ export default function Strike<
         image: profile.avatarUrl,
       }
     },
-    options
+    options,
   }
 }

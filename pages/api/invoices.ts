@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next'
-import { getSession } from "next-auth/react"
+import { getSession } from 'next-auth/react'
 import { api } from 'lib/api.js'
 import { PageResults, Invoice } from 'lib/strike-api'
 import { IncomingMessage } from 'http'
@@ -14,7 +14,7 @@ export async function getInvoices(req: IncomingMessage) {
 }
 
 export default async (req: NextApiRequest, res: NextApiResponse<PageResults<Invoice>>) => {
-  const data = await getInvoices(req);
+  const data = await getInvoices(req)
   data ? res.status(200).json(data) : res.status(401)
   res.end()
 }

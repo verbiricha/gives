@@ -1,7 +1,8 @@
-import NextAuth from "next-auth"
-import { JWT } from "next-auth/jwt"
-import StrikeProvider from "lib/strike-oauth-provider"
-import ky from 'ky';
+import NextAuth from 'next-auth'
+import { JWT } from 'next-auth/jwt'
+import StrikeProvider from 'lib/strike-oauth-provider'
+import ky from 'ky'
+import db from 'lib/db'
 
 /**
  * Takes a token, and returns a new token with updated
@@ -12,14 +13,14 @@ async function refreshAccessToken(token: JWT) {
   try {
     const response = await ky.post(`${process.env.STRIKE_IDENTITY_SERVER_URL}/connect/token`, {
       headers: {
-        'Content-Type': 'application/x-www-form-urlencoded'
+        'Content-Type': 'application/x-www-form-urlencoded',
       },
       body: new URLSearchParams({
         client_id: process.env.STRIKE_IDENTITY_SERVER_CLIENT_ID,
         client_secret: process.env.STRIKE_IDENTITY_SERVER_CLIENT_SECRET,
         grant_type: 'refresh_token',
-        refresh_token: token.refreshToken
-      })
+        refresh_token: token.refreshToken,
+      }),
     })
 
     const refreshedTokens = await response.json()
@@ -36,11 +37,10 @@ async function refreshAccessToken(token: JWT) {
   } catch (error) {
     return {
       ...token,
-      error: "RefreshAccessTokenError",
+      error: 'RefreshAccessTokenError',
     }
   }
 }
-
 
 // For more information on each option (and a full list of options) go to
 // https://next-auth.js.org/configuration/options
@@ -49,7 +49,7 @@ export default NextAuth({
   providers: [
     StrikeProvider({
       clientId: process.env.STRIKE_IDENTITY_SERVER_CLIENT_ID,
-      clientSecret: process.env.STRIKE_IDENTITY_SERVER_CLIENT_SECRET
+      clientSecret: process.env.STRIKE_IDENTITY_SERVER_CLIENT_SECRET,
     }),
   ],
   // Database optional. MySQL, Maria DB, Postgres and MongoDB are supported.
@@ -69,7 +69,7 @@ export default NextAuth({
     // Use JSON Web Tokens for session instead of database sessions.
     // This option can be used with or without a database for users/accounts.
     // Note: `strategy` should be set to 'jwt' if no database is used.
-    strategy: 'jwt'
+    strategy: 'jwt',
 
     // Seconds - How long until an idle session expires and is no longer valid.
     // maxAge: 30 * 24 * 60 * 60, // 30 days
@@ -146,8 +146,8 @@ export default NextAuth({
       // Access token has expired, try to update it
       const newToken = await refreshAccessToken(token)
 
-      return newToken;
-    }
+      return newToken
+    },
   },
 
   // Events are useful for logging
@@ -155,5 +155,5 @@ export default NextAuth({
   events: {},
 
   // Enable debug messages in the console if you are having problems
-  debug: true
+  debug: true,
 })

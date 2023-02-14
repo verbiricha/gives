@@ -6,11 +6,9 @@ import { Header } from './Header'
 export const Page: FC = ({ children }) => {
   return (
     <>
-        <Header />
-        <Container fixed>
-          {children}
-        </Container>
-        <Footer/>
+      <Header />
+      <Container fixed>{children}</Container>
+      <Footer />
     </>
   )
 }

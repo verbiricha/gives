@@ -2,10 +2,10 @@
 
 > Simple proof of concept that demonstrates Strike OAuth Connect
 
-  * [Installation](#installation)
-  * [Development](#development)
-  * [Configuration](#configuration)
-  * [Demo](#demo)
+- [Installation](#installation)
+- [Development](#development)
+- [Configuration](#configuration)
+- [Demo](#demo)
 
 ## Installation
 
