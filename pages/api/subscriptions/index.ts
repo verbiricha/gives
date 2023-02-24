@@ -17,12 +17,28 @@ export async function getInvoice(id: number, amount: number) {
   return pr
 }
 
-export async function getSubscriptions(authorId: string) {
-  return db.subscription.findMany({
-    where: {
-      authorId,
-    },
-  })
+export async function getSubscriptions(authorId: string, include) {
+  if (include) {
+    const subs = await db.subscription.findMany({
+      where: {
+        authorId,
+      },
+      include,
+    })
+    subs.forEach((s) => {
+      s.executions.forEach((e) => {
+        e.amountFiat = e.amountFiat.toNumber()
+        e.timestamp = e.timestamp.getTime()
+      })
+    })
+    return subs
+  } else {
+    return db.subscription.findMany({
+      where: {
+        authorId,
+      },
+    })
+  }
 }
 
 async function createSubscription(author: string, amount: number, project: number) {
