@@ -12,8 +12,6 @@ datasource db {
 
 model User {
   id    String @id
-  name String
-  email String
   token String
   currency String
   subscriptions Subscription[]
@@ -27,6 +25,7 @@ model Project {
   strike      String?
   lnurl       String?
   subscriptions Subscription[]
+  executions SubscriptionExecution[]
 }
 
 model Subscription {
@@ -48,6 +47,10 @@ model SubscriptionExecution {
 
   subscription Subscription? @relation(fields: [subId], references: [id])
   subId Int?
+
+  project Project @relation(fields: [projectId], references: [id])
+  projectId Int
+
   timestamp DateTime
   amount Int
   amountFiat Decimal

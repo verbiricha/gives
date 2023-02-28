@@ -39,6 +39,12 @@ const Project = ({ user, project }) => {
           </Typography>
         </Stack>
         <Stack alignItems="center" mr={[0, 0, 12]} mb={[2, 2, 0]}>
+          <Typography variant="h4">Monthly</Typography>
+          <Typography variant="p" fontSize="1.5rem">
+            {project.subscriptions.monthly} ϟ
+          </Typography>
+        </Stack>
+        <Stack alignItems="center" mr={[0, 0, 12]} mb={[2, 2, 0]}>
           <Typography variant="h4">Raised</Typography>
           <Typography variant="p" fontSize="1.5rem">
             {project.subscriptions.total} ϟ
@@ -59,6 +65,18 @@ const Home: NextPage<Data> = ({ projects }) => {
     }
   }, [session])
 
+  const globalStats = projects.reduce(
+    ({ amount, monthly, total }, p) => {
+      return {
+        amount: amount + p.subscriptions.amount,
+        monthly: monthly + p.subscriptions.monthly,
+        total: total + p.subscriptions.total,
+      }
+    },
+    { amount: 0, monthly: 0, total: 0 }
+  )
+  console.log('GLobal', globalStats)
+
   return (
     <Page>
       <nav>
@@ -76,6 +94,31 @@ const Home: NextPage<Data> = ({ projects }) => {
           </>
         )}
       </nav>
+      <Stack
+        alignItems="center"
+        justifyContent="space-around"
+        direction={['column', 'column', 'row']}
+        mt={4}
+      >
+        <Stack alignItems="center" mr={[0, 0, 12]} mb={[2, 2, 0]}>
+          <Typography variant="h4">Supporters</Typography>
+          <Typography variant="p" fontSize="1.5rem">
+            {globalStats.amount}
+          </Typography>
+        </Stack>
+        <Stack alignItems="center" mr={[0, 0, 12]} mb={[2, 2, 0]}>
+          <Typography variant="h4">Monthly</Typography>
+          <Typography variant="p" fontSize="1.5rem">
+            {globalStats.monthly} ϟ
+          </Typography>
+        </Stack>
+        <Stack alignItems="center" mr={[0, 0, 12]} mb={[2, 2, 0]}>
+          <Typography variant="h4">Raised</Typography>
+          <Typography variant="p" fontSize="1.5rem">
+            {globalStats.total} ϟ
+          </Typography>
+        </Stack>
+      </Stack>
       {projects.map((p) => (
         <Project user={user} project={p} />
       ))}

@@ -9,6 +9,7 @@ export async function getProjects() {
   const projects = await db.project.findMany({
     include: {
       subscriptions: true,
+      executions: true,
     },
   })
   return projects.map((project) => {
@@ -16,7 +17,8 @@ export async function getProjects() {
       ...project,
       subscriptions: {
         amount: project.subscriptions.length,
-        total: project.subscriptions.reduce((acc, { amount }) => acc + amount, 0),
+        monthly: project.subscriptions.reduce((acc, { amount }) => acc + amount, 0),
+        total: project.executions.reduce((acc, { amount }) => acc + amount, 0),
       },
     }
   })

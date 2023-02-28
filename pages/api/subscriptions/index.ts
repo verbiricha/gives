@@ -41,12 +41,12 @@ export async function getSubscriptions(authorId: string, include) {
   }
 }
 
-async function createSubscription(author: string, amount: number, project: number) {
+async function createSubscription(authorId: string, amount: number, projectId: number) {
   try {
     const created = await db.subscription.create({
       data: {
-        authorId: author,
-        projectId: project,
+        authorId,
+        projectId,
         amount,
       },
     })
@@ -60,12 +60,14 @@ async function createSubscriptionExecution(
   subId: number,
   amount: number,
   amountFiat: number,
-  currency: string
+  currency: string,
+  projectId: number
 ) {
   try {
     const created = await db.subscriptionExecution.create({
       data: {
         subId,
+        projectId,
         amount,
         timestamp: new Date(),
         amountFiat,
@@ -108,15 +110,18 @@ export default async (req: NextApiRequest, res: NextApiResponse<PageResults<Invo
       const lnInvoice = await getInvoice(project, amount)
       const quote = await getLnQuote(client, lnInvoice, usr.currency)
       const sub = await createSubscription(authorId, amount, project)
-      const pay = await payLnQuote(client, quote.paymentQuoteId)
-      const subExec = await createSubscriptionExecution(
-        sub.id,
-        amount,
-        Number(pay.totalAmount.amount),
-        pay.totalAmount.currency
-      )
+      if (process.env.ENV === 'prod') {
+        const pay = await payLnQuote(client, quote.paymentQuoteId)
+        const subExec = await createSubscriptionExecution(
+          sub.id,
+          amount,
+          Number(pay.totalAmount.amount),
+          pay.totalAmount.currency,
+          project.id
+        )
+      }
       if (quote) {
-        res.status(200).json(subExec)
+        res.status(200).json(sub)
       } else {
         res.status(404)
       }
