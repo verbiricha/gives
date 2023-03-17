@@ -65,7 +65,7 @@ const Home: NextPage<Data> = ({ projects }) => {
       </Stack>
       <Typography variant="h3">Projects</Typography>
       {projects.map((p) => (
-        <Box mb={4} key={p.id}>
+        <Box mt={4} mb={4} key={p.id}>
           <Project project={p} showStats={false} />
         </Box>
       ))}
