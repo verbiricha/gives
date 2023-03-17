@@ -1,0 +1,62 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String @id
+  token         String
+  currency      String
+  handle        String
+  description   String @default("")
+  avatarUrl     String @default("")
+  subscriptions Subscription[]
+}
+
+model Project {
+  id            Int     @id @default(autoincrement())
+  name          String
+  slug          String @default("")
+  image         String @default("")
+  description   String?
+  lnurl         String
+  subscriptions Subscription[]
+  executions    SubscriptionExecution[]
+}
+
+model Subscription {
+  id         Int @id @default(autoincrement())
+
+  project    Project @relation(fields: [projectId], references: [id])
+  projectId  Int
+
+  author     User @relation(fields: [authorId], references: [id])
+  authorId   String
+
+  amount     Int
+  isPublic   Boolean @default(true)
+
+  executions SubscriptionExecution[]
+}
+
+model SubscriptionExecution {
+  id           Int @id @default(autoincrement())
+
+  subscription Subscription? @relation(fields: [subId], references: [id])
+  subId        Int?
+
+  project      Project @relation(fields: [projectId], references: [id])
+  projectId    Int
+
+  timestamp    DateTime
+  amount       Int
+  amountFiat   Decimal
+  currency     String
+}
