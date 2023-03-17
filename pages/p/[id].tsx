@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import Link from 'next/link'
-import Head from 'next/Head'
+import Head from 'next/head'
 import Image from 'next/image'
 import type { NextPage, GetServerSideProps } from 'next'
 import { Avatar, Box, Button, Card, Stack, Typography } from '@mui/material'
