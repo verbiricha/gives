@@ -1,21 +1,26 @@
 import { NextApiRequest, NextApiResponse } from 'next'
-import { createClient, getLnQuote, payLnQuote } from 'lib/api'
-import type { Subscription, Project } from 'lib/types'
-import { getPendingSubscriptions, getInvoice, createSubscriptionExecution } from 'lib/db'
+import { createClient, getLnQuote, payLnQuote, refreshAccessToken } from 'lib/api'
+import type { User, Subscription, Project } from 'lib/types'
+import { storeUser, getPendingSubscriptions, getInvoice, createSubscriptionExecution } from 'lib/db'
 
 interface SubParams {
+  user: User
   sub: Subscription
   project: Project
-  token: string
-  currency: string
 }
 
 async function runSubscription(params: SubParams) {
-  const { sub, token, project, currency } = params
-  const client = createClient(process.env.STRIKE_API_URI, token)
+  const { sub, user, project } = params
   try {
+    const newToken = await refreshAccessToken(user.token)
+    if (!newToken) {
+      console.error(`Couldn't refresh user token for ${user.handle}`)
+      return
+    }
+    await storeUser(user.id, newToken.refreshToken)
+    const client = createClient(process.env.STRIKE_API_URI, newToken.accessToken)
     const lnInvoice = await getInvoice(project.id, sub.amount)
-    const quote = await getLnQuote(client, lnInvoice, currency)
+    const quote = await getLnQuote(client, lnInvoice, user.currency)
     if (quote?.paymentId) {
       const pay = await payLnQuote(client, quote.paymentQuoteId)
       await createSubscriptionExecution(
@@ -39,9 +44,8 @@ export default async (req: NextApiRequest, res: NextApiResponse<any>) => {
     for (const sub of pending) {
       await runSubscription({
         sub: sub as Subscription,
+        user: sub.author,
         project: sub.project,
-        token: sub.author.token,
-        currency: sub.author.currency,
       })
     }
     res.status(200)

@@ -29,7 +29,7 @@ export default async (req: NextApiRequest, res: NextApiResponse<any>) => {
     res.end()
   } else if (req.method === 'POST') {
     const { amount, project, isPublic } = req.body
-    const usr = await storeUser(authorId, session!.accessToken as string)
+    const usr = await storeUser(authorId, session!.refreshToken as string)
     const client = createClient(process.env.STRIKE_API_URI, session!.accessToken)
     try {
       const proj = await getProject(project)
